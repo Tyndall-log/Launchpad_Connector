@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: © 2023 Kim Eun-su <eunsu0402@gmail.com>
 SPDX-License-Identifier: LGPL-3.0-linking-exception
 -->
 
-Launchpad_Connector
+Launchpad Connector
 ============
 
 [![UNIQ](https://custom-icon-badges.demolab.com/badge/-UNIQ-FF8F00.svg)](https://fragrant-alarm-7d3.notion.site/UNIQ-fad2be60e85742268cabce1f06184ac1)
@@ -12,7 +12,7 @@ Launchpad_Connector
 [![license](https://custom-icon-badges.demolab.com/badge/license-LGPL--3.0--linking--exception-green.svg?logo=law)](https://spdx.org/licenses/LGPL-3.0-linking-exception.html)
 [![REUSE status](https://api.reuse.software/badge/github.com/IreneStella/Launchpad_Connector)](https://api.reuse.software/info/github.com/IreneStella/Launchpad_Connector)
 
-**Launchpad_Connector**는 [UNIQ_Library](https://api.reuse.software/badge/github.com/IreneStella/Launchpad_Connector)를 위해 개발된 런치패드 연결용 핵심 라이브러리입니다.  
+**Launchpad Connector**는 [UNIQ_Library](https://api.reuse.software/badge/github.com/IreneStella/Launchpad_Connector)를 위해 개발된 런치패드 연결용 핵심 라이브러리입니다.  
 누구나 사용할 수 있도록 라이브러리 형태로 공개합니다.  
 
 ## 주요 기능
@@ -38,10 +38,12 @@ c++ 컴파일러와 [JUCE](https://www.juce.com/) 프레임워크가 필요합�
 ### 최소 빌드 시스템
 
 [JUCE 7](https://juce.com/juce-7-license/)[^각주_JUCE]  
-c++20을 지원하는 컴파일러[^각주_컴파일러]
+c++20을 지원하는 컴파일러[^각주_컴파일러]  
+Cmake 3.28 이상[^각주_Cmake]
 
-[^각주_JUCE]: JUCE v7.0.7 release [github](https://github.com/juce-framework/JUCE/releases/tag/7.0.5)
-[^각주_컴파일러]: MSVC v143(Visual Studio 2022) 및 x64-Clang에서 테스트 되었으며, 다른 컴파일러는 추가적인 설정과 인클루드가 필요할 수 있습니다.
+[^각주_JUCE]: JUCE v7.0.7 release [github](https://github.com/juce-framework/JUCE/releases/tag/7.0.7)
+[^각주_컴파일러]: MSVC v143(Visual Studio 2022) 및 x64-Clang(v16.0.5)에서 테스트 되었으며, 다른 컴파일러는 추가적인 설정과 인클루드가 필요할 수 있습니다.
+[^각주_Cmake]: c++20 표준의 모듈을 효율적으로 사용하기 위해 필요한 최소 버전입니다. [자세히 보기](https://www.kitware.com/import-cmake-the-experiment-is-over/)
 
 ### 대상
 
