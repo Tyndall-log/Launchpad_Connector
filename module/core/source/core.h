@@ -1,0 +1,7 @@
+
+#ifndef LAUNCHPAD_CONNECTOR_CORE_H
+#define LAUNCHPAD_CONNECTOR_CORE_H
+
+#include <iostream>
+
+#endif //LAUNCHPAD_CONNECTOR_CORE_H

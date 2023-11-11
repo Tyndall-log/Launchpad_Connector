@@ -39,11 +39,10 @@ c++ 컴파일러와 [JUCE](https://www.juce.com/) 프레임워크가 필요합�
 
 [JUCE 7](https://juce.com/juce-7-license/)[^각주_JUCE]  
 c++20을 지원하는 컴파일러[^각주_컴파일러]  
-Cmake 3.28 이상[^각주_Cmake]
+Cmake 3.26 이상
 
 [^각주_JUCE]: JUCE v7.0.7 release [github](https://github.com/juce-framework/JUCE/releases/tag/7.0.7)
 [^각주_컴파일러]: MSVC v143(Visual Studio 2022) 및 x64-Clang(v16.0.5)에서 테스트 되었으며, 다른 컴파일러는 추가적인 설정과 인클루드가 필요할 수 있습니다.
-[^각주_Cmake]: c++20 표준의 모듈을 효율적으로 사용하기 위해 필요한 최소 버전입니다. [자세히 보기](https://www.kitware.com/import-cmake-the-experiment-is-over/)
 
 ### 대상
 
