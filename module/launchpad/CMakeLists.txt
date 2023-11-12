@@ -4,7 +4,7 @@ project(UNIQ_Library_launchpad)  #프로젝트 이름 설정
 set(CMAKE_CXX_STANDARD 20)  #c++20 표준 사용
 
 # JUCE 라이브러리를 다운로드 및 빌드합니다.
-set(JUCE_VERSION 7.0.7)  #juce 버전 설정
+set(JUCE_VERSION 7.0.8)  #juce 버전 설정
 set(JUCE_URL "https://github.com/juce-framework/JUCE/releases/download/")  #juce 다운 경로
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 	set(JUCE_URL "${JUCE_URL}${JUCE_VERSION}/juce-${JUCE_VERSION}-windows.zip")
@@ -19,7 +19,7 @@ include(FetchContent)  #다운로드 도구 활성화
 FetchContent_Declare(
 		juce
 		URL ${JUCE_URL}
-		SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../juce
+		SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../juce  # 다운로드될 디렉토리 지정
 )  #juce 다운로드 설정
 FetchContent_MakeAvailable(juce)  #juce 설치
 
@@ -46,3 +46,11 @@ link_library(UNIQ_Library_launchpad_test)  #라이브러리 링크
 
 add_library(UNIQ_Library_launchpad ${SOURCE_FILES})  #라이브러리 생성
 link_library(UNIQ_Library_launchpad)  #라이브러리 링크
+
+## 소스 직접 포함
+#add_executable(UNIQ_Library_launchpad_test_direct console_test/main.cpp ${SOURCE_FILES}
+#		../core/source/core.cpp)
+#target_link_libraries(UNIQ_Library_launchpad_test_direct PRIVATE juce::juce_core)
+#target_link_libraries(UNIQ_Library_launchpad_test_direct PRIVATE juce::juce_audio_devices)
+#target_include_directories(UNIQ_Library_launchpad_test_direct PRIVATE ../core/source)
+

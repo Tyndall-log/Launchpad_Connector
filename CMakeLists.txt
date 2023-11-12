@@ -4,7 +4,7 @@ project(Launchpad_Connector)  #프로젝트 이름 설정
 set(CMAKE_CXX_STANDARD 20)  #c++20 표준 사용
 
 # JUCE 라이브러리를 다운로드 및 빌드합니다.
-set(JUCE_VERSION 7.0.7)  #juce 버전 설정
+set(JUCE_VERSION 7.0.8)  #juce 버전 설정
 set(JUCE_URL "https://github.com/juce-framework/JUCE/releases/download/")  #juce 다운 경로
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 	set(JUCE_URL "${JUCE_URL}${JUCE_VERSION}/juce-${JUCE_VERSION}-windows.zip")

@@ -12,7 +12,7 @@ Launchpad Connector
 [![license](https://custom-icon-badges.demolab.com/badge/license-LGPL--3.0--linking--exception-green.svg?logo=law)](https://spdx.org/licenses/LGPL-3.0-linking-exception.html)
 [![REUSE status](https://api.reuse.software/badge/github.com/IreneStella/Launchpad_Connector)](https://api.reuse.software/info/github.com/IreneStella/Launchpad_Connector)
 
-**Launchpad Connector**는 [UNIQ_Library](https://api.reuse.software/badge/github.com/IreneStella/Launchpad_Connector)를 위해 개발된 런치패드 연결용 핵심 라이브러리입니다.  
+**Launchpad Connector**는 [UNIQ_Library](https://github.com/Tyndall-log/UNIQ_Library)를 위해 개발된 런치패드 연결용 핵심 라이브러리입니다.  
 누구나 사용할 수 있도록 라이브러리 형태로 공개합니다.  
 
 ## 주요 기능
