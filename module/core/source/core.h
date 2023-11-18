@@ -76,6 +76,7 @@ namespace uniq
 	//객체가 임의로 생성되지 않도록 생성자를 private로 선언하는 것을 권장합니다.
 	template<typename T> class ID
 	{
+		//TODO: create()를 경유하지 않은 객체를 생성할 수 없게 함.
 	private:
 		std::size_t id_ = 0; //0은 무효한 ID입니다.
 	protected:
@@ -134,6 +135,31 @@ namespace uniq
 			if (it2 == second.end()) return std::nullopt;
 			return it2->second;
 		}
+	};
+	
+	//class hierarchy;
+	class hierarchy
+	{
+	private:
+		std::vector<std::weak_ptr<hierarchy>> children_;
+	protected:
+		class child_component
+		{
+			const hierarchy& parent_;
+		protected:
+			child_component(const hierarchy& parent) : parent_(parent) {}
+		public:
+			void add(std::shared_ptr<hierarchy> child)
+			{
+			}
+		} child;
+		class {
+			//const hierarchy& parent_;
+		} component_1;
+		class {} component_2;
+		class {} component_3;
+		class {} component_4;
+		class {} component_5;
 	};
 	
 	
