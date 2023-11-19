@@ -138,29 +138,28 @@ namespace uniq
 	};
 	
 	//class hierarchy;
-	class hierarchy
-	{
-	private:
-		std::vector<std::weak_ptr<hierarchy>> children_;
-	protected:
-		class child_component
-		{
-			const hierarchy& parent_;
-		protected:
-			child_component(const hierarchy& parent) : parent_(parent) {}
-		public:
-			void add(std::shared_ptr<hierarchy> child)
-			{
-			}
-		} child;
-		class {
-			//const hierarchy& parent_;
-		} component_1;
-		class {} component_2;
-		class {} component_3;
-		class {} component_4;
-		class {} component_5;
-	};
+//	class hierarchy
+//	{
+//	private:
+//		std::vector<std::weak_ptr<hierarchy>> child_list_;
+//	protected:
+//		template<typename T>
+//		class chain
+//		{
+//		private:
+//			T value_;
+//		public:
+//			chain(T default_value) : value_(default_value)
+//			{
+//
+//			}
+//		};
+//	public:
+//		void child_add(std::shared_ptr<hierarchy>& child)
+//		{
+//			child_list_.emplace_back(child);
+//		}
+//	};
 	
 	
 	//콘솔에서 메인 스레드와 독립적으로 메시지 이벤트 처리할 수 있도록 하는 클래스

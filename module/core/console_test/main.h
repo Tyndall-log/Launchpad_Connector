@@ -1,14 +1,7 @@
 // SPDX-FileCopyrightText: © 2023 Kim Eun-su <eunsu0402@gmail.com>
 // SPDX-License-Identifier: LGPL-3.0-linking-exception
 
-#include "main.h"
+#include "core.h"
 
-int main()
-{
-	system("chcp 65001"); //한글 설정
-	
-	//test1();
-	test2();
-	
-	return 0;
-}
+int test1();
+int test2();
