@@ -3,105 +3,126 @@
 
 #include "main.h"
 
-using namespace std;
-using namespace juce;
-using namespace uniq;
 
-class hierarchy
+namespace ns_test2
 {
-private:
-	std::vector<std::weak_ptr<hierarchy>> child_list_;
-	std::vector<std::any> chain_list_;
-	std::vector<std::function<void(std::shared_ptr<hierarchy>&)>> chain_func_list_;
-//protected:
-public:
-	template<typename T>
-	class chain
+	using namespace std;
+	using namespace juce;
+	using namespace uniq;
+	
+	class hierarchy
 	{
 	private:
+		std::vector<std::weak_ptr<hierarchy>> child_list_;
+		std::vector<std::any> chain_list;
+		//std::vector<std::any> chain_list_2;
+		std::vector<std::function<void(std::any)>> chain_func_list_;
+	//protected:
 	public:
-		shared_ptr<T> value_;
-		std::vector<std::any> sync_list_;
-		bool sync_;
-		chain(hierarchy* parent, T value, std::initializer_list<std::any> sync_list):
-				chain(parent, value, true, sync_list){};
-		chain(hierarchy* parent, T value, bool sync, std::initializer_list<std::any> sync_list)
+		
+		template<typename T>
+		class chain
 		{
-			value_ = make_shared<T>(value);
-			sync_ = sync;
-			sync_list_ = sync_list;
-			if (parent)
+			struct sync_data
 			{
-				parent->chain_list_.emplace_back(this);
-				parent->chain_func_list_.emplace_back([this](std::shared_ptr<hierarchy>& child)
-				{
-					child->chain_list_.emplace_back(this);
-				});
+				function<void(std::any)> chain_func;
+				std::map<hierarchy*, chain<T>*> sync_map;
+			};
+		private:
+			shared_ptr<T> value_;
+			std::vector<function<void(T&)>> sync_func_list_;
+			std::vector<chain<T>*> sync_list_;
+			std::set<type_index> sync_type_list_;
+			std::map<type_index, sync_data> sync_map_;
+			bool sync_;
+			
+			template<typename K>
+			void sync_type_register(chain<T> K::* member_ptr)
+			{
+				cout << "sync_type_register: " << typeid(member_ptr).name() << "\n";
+				cout << "K: " << typeid(K).name() << "\n";
+				
+				auto data = sync_data();
+				data.chain_func = [&data, &member_ptr](std::any obj){
+					if (auto pObj = std::any_cast<K>(&obj)) {
+						cout << "chain_connect: " << typeid(&(pObj->*member_ptr)).name() << "\n";
+						data.sync_map[pObj] = &(pObj->*member_ptr);
+					}
+				};
+				sync_map_.try_emplace(typeid(K), data);
+			}
+		protected:
+			template<typename K>
+			void sync_register(std::shared_ptr<K>& child)
+			{
+				cout << "sync_register: " << typeid(K).name() << "\n";
+				sync_map_[typeid(K)].emplace(child.get(), this);
+			}
+		public:
+			chain(hierarchy* parent, T value):
+					chain(parent, value, true){};
+			template<typename... Others>
+			chain(hierarchy* parent, T value, bool sync, Others... others) {
+				value_ = std::make_shared<T>(value);
+				sync_ = sync;
+				
+				// 외부에 등록
+				if (parent) {
+					parent->chain_list.emplace_back(this);
+					parent->chain_func_list_.emplace_back([&](std::any class_name){
+						//sync_map_에 class_name 있는지 확인
+						cout << "class_name: " << class_name.type().name() << "\n";
+						if (auto it = sync_map_.find(class_name.type()); it != sync_map_.end())
+						{
+							it->second.chain_func(class_name);
+						}
+					});
+				}
+				
+				// sync_type_register 호출
+				(sync_type_register(others), ...);
+				
+				
+			}
+			
+		};
+	public:
+		template<typename T>
+		void child_add(std::shared_ptr<T>& child)
+		{
+			child_list_.emplace_back(child);
+			
+			for (auto& f: chain_func_list_)
+			{
+				f(*child);
+				cout << "chain_func_list_ called\n";
 			}
 		}
-		
-		chain& operator=(const T& value)
-		{
-			value_ = value;
-			return *this;
-		}
-		
-		operator T()
-		{
-			return *value_;
-		}
-		
-		void register_sync(std::shared_ptr<hierarchy>& child)
-		{
-		
-		}
 	};
-public:
-	template<typename T>
-	void child_add(std::shared_ptr<T>& child)
+	
+	class test_class2 : public hierarchy
 	{
-		child_list_.emplace_back(child);
-		
-		for(auto& f : chain_func_list_)
-		{
-			f(child);
-		}
-	}
-};
+	public:
+		chain<int> value_{this, 0, false};
+	};
+	
+	class test_class : public hierarchy
+	{
+	private:
+		chain<int> value_{this, 0, false, &test_class2::value_, &test_class::value_};
+	};
+}
 
-class test_class2 : public hierarchy
-{
-public:
-	chain<int> value_{this, 0, false, {&test_class2::value_}};
-};
-
-class test_class : public hierarchy
-{
-private:
-	chain<int> value_{this, 0, false, {&test_class2::value_, &test_class::value_}};
-};
+using namespace ns_test2;
 
 int test2()
 {
 	//메모: decltype: 타입 추론
 	
-	any a = &test_class2::value_;
+	auto a = make_shared<test_class>();
+	auto b = make_shared<test_class2>();
 	
-	cout << a.type().name() << "\n";
-	
-	//auto a_value_ptr = any_cast<shared_ptr<int> test_class2::*>(a);
-	try {
-			auto a_value_ptr = any_cast<test_class2::chain<int> test_class::*>(a);
-		test_class obj;
-		cout << obj.*a_value_ptr << "\n"; // obj의 value_ 값을 출력
-		cout << typeid(&obj).name() << "\n";
-	} catch (const bad_any_cast& e) {
-		cout << "Bad any_cast: " << e.what() << "\n";
-	}
-//
-//	test_class2 obj;
-//	cout << obj.value_ << "\n"; // obj의 value_ 값을 출력
-//	//cout << obj.*a_value_ptr << "\n"; // obj의 value_ 값을 출력
+	a->child_add(b);
 	
 	return 0;
 }
