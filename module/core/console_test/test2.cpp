@@ -14,8 +14,6 @@ namespace ns_test2
 	{
 	private:
 		std::vector<std::weak_ptr<hierarchy>> child_list_;
-		std::vector<std::any> chain_list;
-		//std::vector<std::any> chain_list_2;
 		std::vector<std::function<void(std::any)>> chain_func_list_;
 	//protected:
 	public:
@@ -25,16 +23,13 @@ namespace ns_test2
 		{
 			struct sync_data
 			{
-				function<void(std::any)> chain_func;
+				std::function<void(std::any)> chain_func;
 				std::map<hierarchy*, chain<T>*> sync_map;
 			};
 		private:
 			shared_ptr<T> value_;
-			std::vector<function<void(T&)>> sync_func_list_;
-			std::vector<chain<T>*> sync_list_;
-			std::set<type_index> sync_type_list_;
+			bool sync_{};
 			std::map<type_index, sync_data> sync_map_;
-			bool sync_;
 			
 			template<typename K>
 			void sync_type_register(chain<T> K::* member_ptr)
@@ -42,39 +37,39 @@ namespace ns_test2
 				cout << "sync_type_register: " << typeid(member_ptr).name() << "\n";
 				cout << "K: " << typeid(K).name() << "\n";
 				
-				auto data = sync_data();
-				data.chain_func = [&data, &member_ptr](std::any obj){
-					if (auto pObj = std::any_cast<K>(&obj)) {
-						cout << "chain_connect: " << typeid(&(pObj->*member_ptr)).name() << "\n";
-						data.sync_map[pObj] = &(pObj->*member_ptr);
-					}
-				};
-				sync_map_.try_emplace(typeid(K), data);
-			}
-		protected:
-			template<typename K>
-			void sync_register(std::shared_ptr<K>& child)
-			{
-				cout << "sync_register: " << typeid(K).name() << "\n";
-				sync_map_[typeid(K)].emplace(child.get(), this);
+				if (auto [iter, inserted] = sync_map_.try_emplace(typeid(K*)); inserted)
+				{
+					auto& data = iter->second;
+					data.chain_func = [&data, &member_ptr](std::any obj)
+					{
+						auto class_ptr = std::any_cast<K*>(obj);
+						cout << "obj: " << obj.type().name() << "\n";
+						cout << "chain_connect: " << typeid(&(class_ptr->*member_ptr)).name() << "\n";
+						cout << "chain_connect: " << typeid(class_ptr).name() << "\n";
+						cout << "data_pointer: " << &data << "\n";
+						cout << "data.sync_map.size(): " << data.sync_map.size() << "\n";
+						data.sync_map.try_emplace(class_ptr, &(class_ptr->*member_ptr));
+					};
+				}
 			}
 		public:
-			chain(hierarchy* parent, T value):
-					chain(parent, value, true){};
+			chain(hierarchy* parent, T value) : chain(parent, value, false){};
 			template<typename... Others>
-			chain(hierarchy* parent, T value, bool sync, Others... others) {
+			chain(hierarchy* parent, T value, bool sync, Others... others)
+			{
 				value_ = std::make_shared<T>(value);
 				sync_ = sync;
 				
 				// 외부에 등록
-				if (parent) {
-					parent->chain_list.emplace_back(this);
-					parent->chain_func_list_.emplace_back([&](std::any class_name){
+				if (parent)
+				{
+					parent->chain_func_list_.emplace_back([&](std::any class_ptr)
+					{
 						//sync_map_에 class_name 있는지 확인
-						cout << "class_name: " << class_name.type().name() << "\n";
-						if (auto it = sync_map_.find(class_name.type()); it != sync_map_.end())
+						cout << "class_name: " << class_ptr.type().name() << "\n";
+						if (auto it = sync_map_.find(class_ptr.type()); it != sync_map_.end())
 						{
-							it->second.chain_func(class_name);
+							it->second.chain_func(class_ptr);
 						}
 					});
 				}
@@ -91,11 +86,9 @@ namespace ns_test2
 		void child_add(std::shared_ptr<T>& child)
 		{
 			child_list_.emplace_back(child);
-			
 			for (auto& f: chain_func_list_)
 			{
-				f(*child);
-				cout << "chain_func_list_ called\n";
+				f(child.get());
 			}
 		}
 	};
@@ -103,7 +96,7 @@ namespace ns_test2
 	class test_class2 : public hierarchy
 	{
 	public:
-		chain<int> value_{this, 0, false};
+		chain<int> value_{this, 0, false, &test_class2::value_};
 	};
 	
 	class test_class : public hierarchy
@@ -119,10 +112,12 @@ int test2()
 {
 	//메모: decltype: 타입 추론
 	
-	auto a = make_shared<test_class>();
-	auto b = make_shared<test_class2>();
+	auto tc1_1 = make_shared<test_class>();
+	auto tc1_2 = make_shared<test_class>();
+	auto tc2_1 = make_shared<test_class2>();
+	auto tc2_2 = make_shared<test_class2>();
+	auto tc2_3 = make_shared<test_class2>();
 	
-	a->child_add(b);
-	
+	tc1_1->child_add(tc2_1);
 	return 0;
 }
