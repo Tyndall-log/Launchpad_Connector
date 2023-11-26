@@ -27,8 +27,22 @@ namespace uniq
 		registry_.erase(id);
 	}
 #pragma endregion ID_manager
+
+#pragma region hierarchy
+	std::size_t hierarchy::relationship_id_ = 0;
 	
-	
+	hierarchy::~hierarchy()
+	{
+//		for (auto& child: child_list_)
+//		{
+//			child->child_remove(this);
+//		}
+		for (auto& parent: parent_list_)
+		{
+			parent->child_remove(this);
+		}
+	}
+#pragma endregion hierarchy
 	
 	/*template<typename T>
 	juce::SpinLock ID<T>::lock;*/

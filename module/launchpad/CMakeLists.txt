@@ -45,9 +45,11 @@ function(link_library target)  #라이브러리 링크 함수
 endfunction()
 
 add_executable(UNIQ_Library_launchpad_test console_test/main.cpp ${SOURCE_FILES})  #실행 파일 생성
+target_include_directories(UNIQ_Library_launchpad_test PUBLIC header)  #실행 파일에 header 폴더를 포함합니다.
 link_library(UNIQ_Library_launchpad_test)  #라이브러리 링크
 
 add_library(UNIQ_Library_launchpad ${SOURCE_FILES})  #라이브러리 생성
+target_include_directories(UNIQ_Library_launchpad PUBLIC header)  #라이브러리에 header 폴더를 포함합니다.
 link_library(UNIQ_Library_launchpad)  #라이브러리 링크
 
 ## 소스 직접 포함

@@ -288,21 +288,21 @@ namespace uniq
 				if (parent)
 				{
 					parent->chain_func_list_.emplace_back([&](std::any class_ptr, mode mode)
-					{
-						switch (mode)
-						{
-							case mode::add: // 추가 모드
-								if (auto it = child_map_.find(class_ptr.type()); it != child_map_.end())
-									it->second.child_add(class_ptr);
-								break;
-							case mode::remove: // 삭제 모드
-								if (auto it = child_map_.find(class_ptr.type()); it != child_map_.end())
-									it->second.child_remove(std::any_cast<hierarchy*>(class_ptr));
-								break;
-							default:
-								break;
-						}
-					});
+														  {
+															  switch (mode)
+															  {
+																  case mode::add: // 추가 모드
+																	  if (auto it = child_map_.find(class_ptr.type()); it != child_map_.end())
+																		  it->second.child_add(class_ptr);
+																	  break;
+																  case mode::remove: // 삭제 모드
+																	  if (auto it = child_map_.find(class_ptr.type()); it != child_map_.end())
+																		  it->second.child_remove(std::any_cast<hierarchy*>(class_ptr));
+																	  break;
+																  default:
+																	  break;
+															  }
+														  });
 				}
 				
 				// sync_type_register 호출

@@ -41,9 +41,9 @@ endfunction()
 
 file(GLOB CONSOLE_TEST_FILES console_test/*.cpp)  #console_test 폴더 내의 모든 cpp 파일을 찾습니다.
 add_executable(UNIQ_Library_core_test ${CONSOLE_TEST_FILES} ${SOURCE_FILES})  #실행 파일을 만듭니다.
-target_include_directories(UNIQ_Library_core_test PUBLIC source)  #실행 파일에 source 폴더를 포함합니다.
+target_include_directories(UNIQ_Library_core_test PUBLIC header)  #실행 파일에 header 폴더를 포함합니다.
 link_library(UNIQ_Library_core_test)  #실행 파일에 라이브러리를 링크합니다.
 
 add_library(UNIQ_Library_core ${SOURCE_FILES})  #core 라이브러리를 만듭니다.
-target_include_directories(UNIQ_Library_core PUBLIC source)  #core 라이브러리에 source 폴더를 포함합니다.
+target_include_directories(UNIQ_Library_core PUBLIC header)  #core 라이브러리에 header 폴더를 포함합니다.
 link_library(UNIQ_Library_core)  #core 라이브러리에 라이브러리를 링크합니다.
