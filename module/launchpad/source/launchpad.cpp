@@ -36,6 +36,7 @@ namespace uniq
 	
 	void launchpad::midicallback::printHex(const uint8_t* data, size_t length)
 	{
+		printf("MIDI_IN: ");
 		for (size_t i = 0; i < length; i++)
 		{
 			printf("%02x ", data[i]);
@@ -171,7 +172,7 @@ namespace uniq
 		}
 	}
 	
-	void launchpad::set_porgream_mode(bool flag)
+	void launchpad::set_program_mode(bool flag)
 	{
 		auto t = "00'20'29'02'0D'0E'01"_hex;
 		auto f = "00'20'29'02'0D'0E'00"_hex;
@@ -190,7 +191,7 @@ namespace uniq
 		{
 			auto& identifier = deviceInfo.identifier;
 			
-			if (!identifier.startsWith("\\\\?\\usb#")) continue;
+			if (!identifier.startsWith(R"(\\?\usb#)")) continue;
 			
 			auto pos = 0;
 			

@@ -6,6 +6,21 @@ project(Launchpad_Connector)  #프로젝트 이름 설정
 
 set(CMAKE_CXX_STANDARD 20)  #c++20 표준 사용
 
+if(ANDROID)
+	# 참고: https://atsushieno.github.io/2021/01/16/juce-cmake-android-now-works.html
+	set(OBOE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/module/juce/modules/juce_audio_devices/native/oboe")
+	add_subdirectory(${OBOE_DIR} ./oboe)
+
+	add_library(cpufeatures STATIC "${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c")
+	#set_source_files_properties("${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c")
+	add_definitions("-DJUCE_ANDROID=1" "-DJUCE_ANDROID_API_VERSION=16" "-DJUCE_PUSH_NOTIFICATIONS=1"
+			"-DJUCER_ANDROIDSTUDIO_7F0E4A25=1"
+    "-DJUCE_APP_VERSION=1.0.0" "-DJUCE_APP_VERSION_HEX=0x10000")
+	include_directories(AFTER "${ANDROID_NDK}/sources/android/cpufeatures")
+endif()
+
+set(CMAKE_SYSTEM_NAME Windows)  #시스템 이름 설정
+
 # JUCE 라이브러리를 다운로드 및 빌드합니다.
 set(JUCE_VERSION 7.0.8)  #juce 버전 설정
 set(JUCE_URL "https://github.com/juce-framework/JUCE/releases/download/")  #juce 다운 경로

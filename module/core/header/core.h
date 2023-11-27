@@ -10,9 +10,8 @@
 //#include <juce_audio_formats/juce_audio_formats.h>
 //#include <juce_audio_processors/juce_audio_processors.h>
 //#include <juce_gui_basics/components/juce_Component.h>
-#include "core.hpp"
 
-//#include "system.hpp"
+#include "core.hpp"
 #include <algorithm>
 #include <iostream>
 #include <ranges>
@@ -65,7 +64,7 @@ namespace uniq
 			else
 			{
 				throw std::runtime_error("ID_manager::get_shared_ptr_by_ID: ID " + std::to_string(id) + " is not registered."
-										 + std::format("Please check if the object is created by {}::create().", typeid(T).name()));
+										 + "Please check if the object is created by "+ typeid(T).name() + "::create().");
 			}
 			return std::nullopt;
 		}
@@ -171,7 +170,7 @@ namespace uniq
 						auto id = it->second->id;
 						parent_map.erase(it);
 						auto iter = std::lower_bound(parent_list.begin(), parent_list.end(), id,
-							[](const chain_id* a, std::size_t b) { return a->id < b; });
+													 [](const chain_id* a, std::size_t b) { return a->id < b; });
 						if (iter != parent_list.end())
 						{
 							//속도를 위해 지연 삭제 구현 필요
@@ -404,6 +403,9 @@ namespace uniq
 			}
 		}
 	};
+	
+	
+	
 	
 	//콘솔에서 메인 스레드와 독립적으로 메시지 이벤트 처리할 수 있도록 하는 클래스
 	class MainMessageThread : public juce::Thread

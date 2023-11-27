@@ -27,7 +27,7 @@ int test1()
 		return 0;
 	}
 	unique_ptr<launchpad> lp = make_unique<launchpad>(ADM, list[0]);
-	//lp->set_porgream_mode(true);
+	lp->set_program_mode(true);
 	
 	//lp->get_list();
 	auto start = "00h 20h 29h 02h 0Dh 03h"s;
@@ -48,8 +48,8 @@ int test1()
 //		uint8 sysexdata[] = { 0x00,0x20,0x29,0x02,0x0D,0x08,static_cast<uint8>(127 - n) };
 //		MidiMessage 메시지 = MidiMessage::createSysExMessage(sysexdata, 6 + 5);
 //		lp->send_message_now(메시지);
-		MidiMessage 메시지 = MidiMessage::createSysExMessage("002029020D03000B0D010C1517020D"_hex, 15);
-		lp->send_message_now(메시지);
+		//MidiMessage 메시지 = MidiMessage::createSysExMessage("002029020D03000B0D010C1517020D"_hex, 15);
+		//lp->send_message_now(메시지);
 		n += 2;
 	}
 	//return 0;

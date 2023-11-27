@@ -6,25 +6,25 @@ project(UNIQ_Library_launchpad)  #프로젝트 이름 설정
 
 set(CMAKE_CXX_STANDARD 20)  #c++20 표준 사용
 
-# JUCE 라이브러리를 다운로드 및 빌드합니다.
-set(JUCE_VERSION 7.0.8)  #juce 버전 설정
-set(JUCE_URL "https://github.com/juce-framework/JUCE/releases/download/")  #juce 다운 경로
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-	set(JUCE_URL "${JUCE_URL}${JUCE_VERSION}/juce-${JUCE_VERSION}-windows.zip")
-elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	set(JUCE_URL "${JUCE_URL}${JUCE_VERSION}/juce-${JUCE_VERSION}-linux.zip")
-elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-	set(JUCE_URL "${JUCE_URL}${JUCE_VERSION}/juce-${JUCE_VERSION}-osx.zip")
-else()
-	message(FATAL_ERROR "Unsupported system: ${CMAKE_SYSTEM_NAME}")
-endif()
-include(FetchContent)  #다운로드 도구 활성화
-FetchContent_Declare(
-		juce
-		URL ${JUCE_URL}
-		SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../juce  # 다운로드될 디렉토리 지정
-)  #juce 다운로드 설정
-FetchContent_MakeAvailable(juce)  #juce 설치
+## JUCE 라이브러리를 다운로드 및 빌드합니다.
+#set(JUCE_VERSION 7.0.8)  #juce 버전 설정
+#set(JUCE_URL "https://github.com/juce-framework/JUCE/releases/download/")  #juce 다운 경로
+#if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+#	set(JUCE_URL "${JUCE_URL}${JUCE_VERSION}/juce-${JUCE_VERSION}-windows.zip")
+#elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+#	set(JUCE_URL "${JUCE_URL}${JUCE_VERSION}/juce-${JUCE_VERSION}-linux.zip")
+#elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+#	set(JUCE_URL "${JUCE_URL}${JUCE_VERSION}/juce-${JUCE_VERSION}-osx.zip")
+#else()
+#	message(FATAL_ERROR "Unsupported system: ${CMAKE_SYSTEM_NAME}")
+#endif()
+#include(FetchContent)  #다운로드 도구 활성화
+#FetchContent_Declare(
+#		juce
+#		URL ${JUCE_URL}
+#		SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../juce  # 다운로드될 디렉토리 지정
+#)  #juce 다운로드 설정
+#FetchContent_MakeAvailable(juce)  #juce 설치
 
 # 포함할 소스 파일을 찾습니다.
 file(GLOB_RECURSE SOURCE_FILES source/*.cpp)  #source 폴더 내의 모든 cpp 파일을 찾습니다.
@@ -42,6 +42,10 @@ function(link_library target)  #라이브러리 링크 함수
 	target_link_libraries(${target} PRIVATE UNIQ_Library_core)
 	target_link_libraries(${target} PRIVATE juce::juce_core)
 	target_link_libraries(${target} PRIVATE juce::juce_audio_devices)
+	if (ANDROID)
+		target_link_libraries(${target} PRIVATE oboe)
+		target_link_libraries(${target} PRIVATE cpufeatures)
+	endif()
 endfunction()
 
 file(GLOB CONSOLE_TEST_FILES console_test/*.cpp)  #console_test 폴더 내의 모든 cpp 파일을 찾습니다.
@@ -60,3 +64,8 @@ link_library(UNIQ_Library_launchpad)  #라이브러리 링크
 #target_link_libraries(UNIQ_Library_launchpad_test_direct PRIVATE juce::juce_audio_devices)
 #target_include_directories(UNIQ_Library_launchpad_test_direct PRIVATE ../core/source)
 
+
+
+add_library(Launchpad_Connector_Library SHARED ${SOURCE_FILES})  #라이브러리 생성
+target_include_directories(Launchpad_Connector_Library PUBLIC header)  #라이브러리에 header 폴더를 포함합니다.
+link_library(Launchpad_Connector_Library)  #라이브러리 링크

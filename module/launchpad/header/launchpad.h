@@ -65,7 +65,7 @@ namespace uniq
 		void send_LED();
 		void set_rgb(juce::uint8, juce::uint8, juce::uint8, juce::uint8, juce::uint8);
 		void set_velocity(juce::uint8, juce::uint8, juce::uint8);
-		void set_porgream_mode(bool = true);
+		void set_program_mode(bool = true);
 		static juce::Array<juce::MidiDeviceInfo> get_available_list();
 	};
 	
