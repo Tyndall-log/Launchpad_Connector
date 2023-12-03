@@ -3,6 +3,10 @@
 
 #pragma once
 
+#ifdef ANDROID
+	#define JUCE_CORE_INCLUDE_JNI_HELPERS 1
+	#include <android/log.h>
+#endif
 #include <juce_core/juce_core.h>
 #include <juce_events/juce_events.h>
 //#include <juce_audio_basics/juce_audio_basics.h>
@@ -30,11 +34,48 @@ namespace uniq
 #else
 #define API extern "C" __attribute__((visibility("default")))
 #endif
+	
+	class log
+	{
+	public:
+		static std::string message_temp;
+		static std::string message;
+		
+		static void print(std::string_view str)
+		{
+			message += str;
+			#ifdef ANDROID
+			__android_log_print(ANDROID_LOG_INFO, "uniq", "%s", str.data());
+			#else
+			std::cout << str;
+			#endif
+		}
+		
+		static void println(std::string_view str)
+		{
+			print(str);
+			message += "\n";
+			#ifndef ANDROID
+			std::cout << std::endl;
+			#endif
+			
+		}
+		
+		static std::string& get()
+		{
+			message_temp = message;
+			message.clear();
+			return message_temp;
+		}
+	};
+	
+	
 	//ID_manager는 ID<T>를 상속받은 객체를 관리합니다.
 	class ID_manager final
 	{
 		template<typename T> friend class ID;
 		static std::unordered_map<std::size_t, std::any> registry_;
+		//static std::unordered_map<std::size_t, std::any> memory
 		static std::size_t id_; //0은 무효한 ID입니다.
 		static juce::SpinLock lock_;
 	private:
@@ -63,6 +104,8 @@ namespace uniq
 			}
 			else
 			{
+				log::println("ID_manager::get_shared_ptr_by_ID: ID " + std::to_string(id) + " is not registered."
+							 + "Please check if the object is created by "+ typeid(T).name() + "::create().");
 				throw std::runtime_error("ID_manager::get_shared_ptr_by_ID: ID " + std::to_string(id) + " is not registered."
 										 + "Please check if the object is created by "+ typeid(T).name() + "::create().");
 			}
@@ -85,6 +128,7 @@ namespace uniq
 		{
 			ID_manager::unregister_ID(id_);
 		}
+	public:
 		template <typename... K>
 		static std::shared_ptr<T> create(K &&...args)
 		{
@@ -104,7 +148,7 @@ namespace uniq
 		ID& operator=(const ID&) = delete;
 		ID(ID&&) = delete;
 		ID& operator=(ID&&) = delete;
-		[[nodiscard]] size_t get_ID() const
+		[[nodiscard]] size_t ID_get() const
 		{
 			return id_;
 		}

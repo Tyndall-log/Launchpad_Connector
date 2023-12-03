@@ -8,6 +8,14 @@ using namespace juce;
 
 namespace uniq
 {
+#ifdef _WIN32
+#define API extern "C" __declspec(dllexport)
+#else
+#define API extern "C" __attribute__((visibility("default")))
+#endif
+	std::string log::message_temp;
+	std::string log::message;
+	
 #pragma region ID_manager
 	std::size_t ID_manager::id_ = 0;
 	std::unordered_map<std::size_t, std::any> ID_manager::registry_;
@@ -50,7 +58,7 @@ namespace uniq
 	MainMessageThread::MainMessageThread() : Thread("UNIQ_MessageThread")
 	{
 		startThread();
-		cout << (wait(1000) ? "MainMessageThread start" : "MainMessageThread fail") << endl;
+		log::println(wait(1000) ? "MainMessageThread start" : "MainMessageThread fail");
 	}
 	
 	MainMessageThread::~MainMessageThread()
@@ -61,9 +69,10 @@ namespace uniq
 	
 	void MainMessageThread::run()
 	{
-		ScopedJuceInitialiser_GUI SJI_GUI;
+//		ScopedJuceInitialiser_GUI SJI_GUI;
+		auto mm = unique_ptr<MessageManager>(MessageManager::getInstance());
 		notify();
-		MessageManager::getInstance()->runDispatchLoop();
-		cout << "MainMessageThread stop" << endl;
+		mm->runDispatchLoop();
+		log::println("MainMessageThread stop");
 	}
 }

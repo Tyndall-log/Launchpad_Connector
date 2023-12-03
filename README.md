@@ -46,6 +46,8 @@ A. 스네이크 케이스를 채택한 이유는 대소문자 구분이 영어�
 ## 빌드
 
 c++ 컴파일러와 [JUCE](https://www.juce.com/) 프레임워크가 필요합니다.  
+안드로이드는 아래 cmake 옵션으로 빌드 하세요.
+```-DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=<your NDK path>\ndk\<version>\build\cmake\android.toolchain.cmake```
 
 ### 최소 빌드 시스템
 

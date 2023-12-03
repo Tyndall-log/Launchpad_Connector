@@ -44,4 +44,21 @@ FetchContent_MakeAvailable(juce)  #juce 설치
 add_subdirectory(module/core)  #core 모듈 추가
 add_subdirectory(module/launchpad)  #launchpad 모듈 추가
 
+
+function(link_library target)  #라이브러리 링크 함수
+	target_link_libraries(${target} PRIVATE UNIQ_Library_core)
+	target_link_libraries(${target} PRIVATE UNIQ_Library_launchpad)
+	target_link_libraries(${target} PRIVATE juce::juce_core)
+	target_link_libraries(${target} PRIVATE juce::juce_audio_devices)
+	if (ANDROID)
+		target_link_libraries(${target} PRIVATE oboe)
+		target_link_libraries(${target} PRIVATE cpufeatures)
+	endif()
+endfunction()
+
+file(GLOB API_FILES api/*.cpp) #api 폴더 내의 모든 cpp 파일을 찾습니다.
+add_library(Launchpad_Connector_Library SHARED ${API_FILES})
+#target_include_directories(Launchpad_Connector_Library PUBLIC header)  #라이브러리에 header 폴더를 포함합니다.
+link_library(Launchpad_Connector_Library)  #라이브러리 링크
+
 #add_executable(Launchpad_Connector module/launchpad/console_test/main.cpp)

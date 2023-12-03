@@ -8,40 +8,20 @@ using namespace juce;
 
 namespace uniq
 {
-	class MyClass
+	void launchpad::midi_callback::handleIncomingMidiMessage(MidiInput* /*source*/, const MidiMessage& message)
 	{
-	public:
-		MyClass();
-		~MyClass();
-	
-	private:
-	
-	};
-	
-	MyClass::MyClass()
-	{
-		std::cout << endl;
+		//printHex(message.getRawData(), message.getRawDataSize());
+		if (callback_function) callback_function((uint8_t*)message.getRawData(), message.getRawDataSize());
 	}
 	
-	MyClass::~MyClass()
+	void launchpad::midi_callback::printHex(const uint8_t* data, size_t length)
 	{
+		log::println("MIDI_IN: " + String::toHexString(data, static_cast<int>(length)).toStdString());
 	}
 	
-	void launchpad::midicallback::handleIncomingMidiMessage(MidiInput* /*source*/, const MidiMessage& message)
+	void launchpad::midi_callback::callback_set(function<void(uint8_t*, int)>&& callback)
 	{
-		//cout << k << endl;
-		//throw std::runtime_error("테스트");
-		printHex(message.getRawData(), message.getRawDataSize());
-	}
-	
-	void launchpad::midicallback::printHex(const uint8_t* data, size_t length)
-	{
-		printf("MIDI_IN: ");
-		for (size_t i = 0; i < length; i++)
-		{
-			printf("%02x ", data[i]);
-		}
-		printf("\n");
+		callback_function = callback;
 	}
 	
 	void launchpad::init()
@@ -49,10 +29,44 @@ namespace uniq
 	
 	}
 	
-	launchpad::launchpad(shared_ptr<AudioDeviceManager> adm, MidiDeviceInfo mdi)
+	std::string launchpad::launchpad_kind_name_get(juce::MidiDeviceInfo& mdi)
+	{
+		auto& identifier = mdi.identifier;
+		
+		if (!identifier.startsWith(R"(\\?\usb#)")) return "";
+		
+		int pos;
+		
+		pos = identifier.indexOf(8, "vid_");
+		const auto& vid = 0 <= pos ? identifier.substring(pos + 4, pos + 8).toStdString() : "0000";
+		
+		pos = identifier.indexOf(pos + 9, "pid_");
+		const auto& pid = 0 <= pos ? identifier.substring(pos + 4, pos + 8).toStdString() : "0000";
+		
+		//허용하는 런치패드인지 확인
+		auto it = VPID_map.find(vid + pid);
+		if (it == VPID_map.end()) return ""; //지원되는 런치패드 아님.
+		
+		pos = identifier.indexOf(pos + 9, "\\global");
+		auto global_num = 0 <= pos ? identifier.substring(pos + 1).toStdString() : "0";
+		auto num = get<1>(it->second);
+		auto global = 0 < num ? "global-" + String(++num) : "global";
+		
+		if (global_num != global) return ""; //중복 건너뛰기
+		return get<0>(it->second);
+	}
+	
+	launchpad::midi_device_info::midi_device_info(const juce::MidiDeviceInfo&& info) : MidiDeviceInfo(info){}
+	
+	launchpad::midi_device_info::midi_device_info(const juce::MidiDeviceInfo&& info, const juce::String& name) : MidiDeviceInfo(info)
+	{
+		this->kind_name = name.toStdString();
+	}
+	
+	launchpad::launchpad(shared_ptr<AudioDeviceManager> adm, const midi_device_info& mdi)
 	{
 		deviceManager = adm;
-		input_callback = make_unique<midicallback>();
+		input_callback = make_unique<midi_callback>();
 		input = MidiInput::openDevice(mdi.identifier, input_callback.get());
 		output = MidiOutput::openDevice(mdi.identifier);
 		if (!deviceManager)
@@ -61,16 +75,21 @@ namespace uniq
 		}
 		if (!deviceManager->isMidiInputDeviceEnabled(mdi.identifier))
 			deviceManager->setMidiInputDeviceEnabled(mdi.identifier, true);
-		kind_name = mdi.name.toStdString();
+		kind_name = mdi.kind_name;
 		{
 			SpinLock::ScopedLockType lock(mutex);
-			if (launchpad_list.empty()) LED_timer.startTimer(10);
+			if (launchpad_list.empty())
+			{
+				LED_timer = make_unique<LED_global_timer>();
+				LED_timer->startTimer(10);
+			}
 			launchpad_list.insert(this);
 			LED_grid_current = vector<vector<VRGB>>(LED_w, vector<VRGB>(LED_h));
 			LED_grid_target = vector<vector<VRGB>>(LED_w, vector<VRGB>(LED_h));
 			LED_raw_data = make_unique<uint8[]>(static_cast<size_t>(LED_w) * LED_h * 5 + 6);
 			copy_n("00'20'29'02'0D'03"_hex, 6, LED_raw_data.get()); //기본 명령어 헤더
 			automatic_transmission = true;
+			immediate_transmission = false;
 		}
 	}
 	launchpad::~launchpad()
@@ -78,30 +97,34 @@ namespace uniq
 		{
 			SpinLock::ScopedLockType lock(mutex);
 			launchpad_list.erase(this);
-			if (launchpad_list.empty()) LED_timer.stopTimer();
+			if (launchpad_list.empty())
+			{
+				LED_timer->stopTimer();
+				LED_timer.reset();
+			}
 		}
 		deviceManager.reset();
 	}
 	
-	void launchpad::send_message_now(MidiMessage& message)
+	void launchpad::message_send_now(juce::MidiMessage& message)
 	{
 		output->sendMessageNow(message);
 	}
 	
-	void launchpad::send_hex(const String& hex)
+	void launchpad::hex_send(const juce::String& hex)
 	{
 		auto k = hexStringToBytes(hex);
 		auto m = MidiMessage::createSysExMessage(&k[0], static_cast<int>(k.size()));
-		send_message_now(m);
+		message_send_now(m);
 	}
 	
-	void launchpad::send_hex(const uint8* hex, size_t length)
+	void launchpad::hex_send(const juce::uint8* hex, size_t length)
 	{
 		auto m = MidiMessage::createSysExMessage(hex, static_cast<int>(length));
-		send_message_now(m);
+		message_send_now(m);
 	}
 	
-	void launchpad::send_LED()
+	void launchpad::LED_send()
 	{
 		auto p = LED_raw_data.get() + 6;
 		for (auto x = 0; x < LED_w; x++)
@@ -136,12 +159,12 @@ namespace uniq
 		output->sendMessageNow(m);
 	}
 	
-	void launchpad::set_rgb(uint8 x, uint8 y, uint8 r, uint8 g, uint8 b)
+	void launchpad::rgb_set(uint8 x, uint8 y, uint8 r, uint8 g, uint8 b)
 	{
 		if (LED_w < x || LED_h < y) throw range_error("x 또는 y 범위 오류");
 		SpinLock::ScopedLockType lock(mutex);
 		LED_grid_target[x][y] = VRGB{ 0xFF,static_cast<uint8>(r >> 1),static_cast<uint8>(g >> 1),static_cast<uint8>(b >> 1) };
-		if (!automatic_transmission)
+		if (immediate_transmission)
 		{
 			auto p = LED_raw_data.get() + 6;
 			*p++ = 0x03;
@@ -155,12 +178,12 @@ namespace uniq
 		}
 	}
 	
-	void launchpad::set_velocity(uint8 x, uint8 y, uint8 v)
+	void launchpad::velocity_set(uint8 x, uint8 y, uint8 v)
 	{
 		if (LED_w < x || LED_h < y) throw range_error("x 또는 y 범위 오류");
 		SpinLock::ScopedLockType lock(mutex);
 		LED_grid_target[x][y] = VRGB{ v,0,0,0 };
-		if (!automatic_transmission)
+		if (immediate_transmission)
 		{
 			auto p = LED_raw_data.get() + 6;
 			*p++ = 0x00;
@@ -172,54 +195,78 @@ namespace uniq
 		}
 	}
 	
-	void launchpad::set_program_mode(bool flag)
+	void launchpad::program_mode_set(bool flag)
 	{
 		auto t = "00'20'29'02'0D'0E'01"_hex;
 		auto f = "00'20'29'02'0D'0E'00"_hex;
 		MidiMessage 메시지 = MidiMessage::createSysExMessage(flag ? t : f, 7);
-		send_message_now(메시지);
+		message_send_now(메시지);
 	}
 	
-	Array<MidiDeviceInfo> launchpad::get_available_list()
+	void launchpad::automatic_transmission_set(bool flag)
 	{
-		Array<MidiDeviceInfo> devices;
+		if (flag == automatic_transmission) return;
+		SpinLock::ScopedLockType lock(mutex);
+		automatic_transmission = flag;
+	}
+	
+	void launchpad::immediate_transmission_set(bool flag)
+	{
+		if (flag == immediate_transmission) return;
+		SpinLock::ScopedLockType lock(mutex);
+		immediate_transmission = flag;
+	}
+	
+	void launchpad::immediate_transmission_global_timer_set(int ms)
+	{
+		LED_timer->startTimer(ms);
+	}
+	
+	void launchpad::input_callback_set(std::function<void(std::uint8_t*, int)>&& callback)
+	{
+		input_callback->callback_set(std::move(callback));
+	}
+	
+	vector<launchpad::midi_device_info> launchpad::get_available_input_list()
+	{
+		vector<launchpad::midi_device_info> devices;
 		auto id_list = map<string, uint8_t>();
-		//auto availableDevices = MidiInput::getAvailableDevices();
+		auto availableDevices = MidiInput::getAvailableDevices();
+		
+		for (auto& deviceInfo : availableDevices)
+		{
+			auto name = launchpad_kind_name_get(deviceInfo);
+			if (name.empty()) continue;
+			devices.emplace_back(std::move(deviceInfo), name);
+		}
+		
+		return devices;
+	}
+	
+	vector<launchpad::midi_device_info> launchpad::get_available_output_list()
+	{
+		vector<launchpad::midi_device_info> devices;
+		auto id_list = map<string, uint8_t>();
 		auto availableDevices = MidiOutput::getAvailableDevices();
 		
 		for (auto& deviceInfo : availableDevices)
 		{
-			auto& identifier = deviceInfo.identifier;
-			
-			if (!identifier.startsWith(R"(\\?\usb#)")) continue;
-			
-			auto pos = 0;
-			
-			pos = identifier.indexOf(8, "vid_");
-			const auto& vid = 0 <= pos ? identifier.substring(pos + 4, pos + 8).toStdString() : "0000";
-			
-			pos = identifier.indexOf(pos + 9, "pid_");
-			const auto& pid = 0 <= pos ? identifier.substring(pos + 4, pos + 8).toStdString() : "0000";
-			
-			//허용하는 런치패드인지 확인
-			auto it = VPID_map.find(vid + pid);
-			if (it == VPID_map.end()) continue; //지원되는 런치패드 아님.
-			
-			pos = identifier.indexOf(pos + 9, "{");
-			const auto& id = 0 <= pos ? identifier.substring(pos + 1, identifier.indexOf(pos + 1, "}")).toStdString() : "0";
-			
-			auto [id_list_it, success] = id_list.try_emplace(id, 0_uc);
-			if (!success) ++(id_list_it->second);
-			
-			if (id_list_it->second != get<1>(it->second)) continue; //중복 건너뛰기
-			deviceInfo.name = get<0>(it->second);
-			
-			//cout << vid << " " << pid << " " << id << " -> " << deviceInfo.name << endl;
-			//cout << deviceInfo.identifier << endl;
-			devices.add(deviceInfo);
+			auto name = launchpad_kind_name_get(deviceInfo);
+			if (name.empty()) continue;
+			devices.emplace_back(std::move(deviceInfo), name);
 		}
 		
 		return devices;
+	}
+	
+	string launchpad::input_identifier_get()
+	{
+		return input->getIdentifier().toStdString();
+	}
+	
+	string launchpad::output_identifier_get()
+	{
+		return output->getIdentifier().toStdString();
 	}
 	
 	vector<uint8> hexStringToBytes(const String& input)
@@ -266,9 +313,9 @@ namespace uniq
 			{"1235" "0123", {"Novation Launchpad Pro MK3", 1_uc}}
 	};
 	
+	unique_ptr<launchpad::LED_global_timer> launchpad::LED_timer = nullptr;
 	set<launchpad*> launchpad::launchpad_list = set<launchpad*>();
 	SpinLock launchpad::mutex = SpinLock();
-	launchpad::LED_global_timer launchpad::LED_timer = launchpad::LED_global_timer();
 	
 	void launchpad::LED_global_timer::hiResTimerCallback()
 	{
@@ -276,7 +323,7 @@ namespace uniq
 		for (auto& l : launchpad_list)
 		{
 			if (!l->automatic_transmission) continue;
-			l->send_LED();
+			l->LED_send();
 		}
 		//printf("!");
 	}
