@@ -39,7 +39,7 @@ int test1()
 	lp->program_mode_set(true);
 	lp->input_callback_set([](uint8* data, int size)
 	{
-		log::println("MIDI_IN: " + String::toHexString(data, static_cast<int>(size)).toStdString());
+		log::println("MIDI_IN: " + String::toHexString(data, size).toStdString());
 	});
 	
 	//main_launchpad->get_list();

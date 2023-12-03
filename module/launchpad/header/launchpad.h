@@ -70,6 +70,7 @@ namespace uniq
 		//launchpad();
 		//launchpad(String kind);
 		launchpad(std::shared_ptr<juce::AudioDeviceManager>, const midi_device_info&);
+		launchpad(std::shared_ptr<juce::AudioDeviceManager>, const midi_device_info&, const midi_device_info&);
 		~launchpad();
 		
 		void message_send_now(juce::MidiMessage&);

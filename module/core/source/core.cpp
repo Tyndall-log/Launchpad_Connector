@@ -63,16 +63,17 @@ namespace uniq
 	
 	MainMessageThread::~MainMessageThread()
 	{
-		MessageManager::getInstanceWithoutCreating()->stopDispatchLoop();
+		auto mm = MessageManager::getInstanceWithoutCreating();
+		if (!mm) return;
+		mm->stopDispatchLoop();
+		log::println("MainMessageThread stop");
 		stopThread(1000);
 	}
 	
 	void MainMessageThread::run()
 	{
-//		ScopedJuceInitialiser_GUI SJI_GUI;
 		auto mm = unique_ptr<MessageManager>(MessageManager::getInstance());
 		notify();
 		mm->runDispatchLoop();
-		log::println("MainMessageThread stop");
 	}
 }

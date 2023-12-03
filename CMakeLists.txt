@@ -56,7 +56,12 @@ function(link_library target)  #라이브러리 링크 함수
 	endif()
 endfunction()
 
-file(GLOB API_FILES api/*.cpp) #api 폴더 내의 모든 cpp 파일을 찾습니다.
+#file(GLOB API_FILES api/*.cpp) #api 폴더 내의 모든 cpp 파일을 찾습니다.
+if (ANDROID)
+	set(API_FILES api/android_flutter_so.cpp)
+else()
+	set(API_FILES api/windows_gms2_dll.cpp)
+endif()
 add_library(Launchpad_Connector_Library SHARED ${API_FILES})
 #target_include_directories(Launchpad_Connector_Library PUBLIC header)  #라이브러리에 header 폴더를 포함합니다.
 link_library(Launchpad_Connector_Library)  #라이브러리 링크

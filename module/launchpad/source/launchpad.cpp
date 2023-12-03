@@ -64,18 +64,17 @@ namespace uniq
 	}
 	
 	launchpad::launchpad(shared_ptr<AudioDeviceManager> adm, const midi_device_info& mdi)
+	: launchpad(adm, mdi, mdi) {}
+	
+	launchpad::launchpad(shared_ptr<AudioDeviceManager> adm, const midi_device_info& mdi_input, const midi_device_info& mdi_output)
 	{
 		deviceManager = adm;
 		input_callback = make_unique<midi_callback>();
-		input = MidiInput::openDevice(mdi.identifier, input_callback.get());
-		output = MidiOutput::openDevice(mdi.identifier);
-		if (!deviceManager)
-		{
-			deviceManager = std::make_shared<AudioDeviceManager>();
-		}
-		if (!deviceManager->isMidiInputDeviceEnabled(mdi.identifier))
-			deviceManager->setMidiInputDeviceEnabled(mdi.identifier, true);
-		kind_name = mdi.kind_name;
+		input = MidiInput::openDevice(mdi_input.identifier, input_callback.get());
+		if (input) input->start();
+		else log::println("input is null");
+		output = MidiOutput::openDevice(mdi_output.identifier);
+		kind_name = mdi_input.kind_name;
 		{
 			SpinLock::ScopedLockType lock(mutex);
 			if (launchpad_list.empty())
@@ -108,6 +107,11 @@ namespace uniq
 	
 	void launchpad::message_send_now(juce::MidiMessage& message)
 	{
+		if (!output)
+		{
+			log::println("output is null");
+			return;
+		}
 		output->sendMessageNow(message);
 	}
 	
