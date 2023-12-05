@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: LGPL-3.0-linking-exception
 
 // 이 파일은 외부 어플리케이션에서 "Launchpad Connector"를 사용하기 위한 동적 라이브러리의 예제를 보여줍니다.
-// 예제에서는 GMS2(Gamemaker Studio 2)의 windows용 DLL로 빌드해보는 과정을 보여줍니다.
-// GMS2에서는 DLL과 오로지 char*, double만 주고 받을 수 있는 제약사항이 있습니다.
+// 본 라이브러리를 외부 프로그램인 GMS2(Gamemaker Studio 2)에서 사용하기 위해 windows용 DLL빌드합니다.
+// 특히, GMS2에서는 DLL과 오로지 char*, double만 주고 받을 수 있는 제약사항이 있습니다.
 // 이 예제 목표는 이런 제약사항에서도 효과적이고 잘 동작하는 방법을 보여주는 것입니다.
 
 #include "launchpad.h"
@@ -60,17 +60,6 @@ API char* midi_input_list()
 	return (char*)str.c_str();
 }
 
-//런치패드를 설정합니다.
-void launchpad_set(shared_ptr<launchpad> lp)
-{
-	lp->program_mode_set(true); //프로그램 모드로 설정
-	auto lp_identifier = lp->input_identifier_get();
-	lp->input_callback_set([lp_identifier](uint8_t* data, int length)
-	{
-		launchpad_input_queue[lp_identifier].emplace(data, data + length);
-	});
-}
-
 //N 번째 런치패드를 연결합니다.
 API double midi_input_open(double N)
 {
@@ -82,11 +71,16 @@ API double midi_input_open(double N)
 	auto [iter, success] = launchpad_list.try_emplace(element.identifier.toStdString(), nullptr);
 	if (success)
 	{
-		iter->second = launchpad::create(ADM, element);
-		launchpad_set(iter->second);
+		iter->second = launchpad::create(ADM);
 	}
-	
-	return static_cast<double>(iter->second->ID_get());
+	auto& lp = iter->second;
+	lp->midi_input_set(element);
+	auto lp_identifier = lp->input_identifier_get();
+	lp->input_callback_set([lp_identifier](uint8_t* data, int length)
+	{
+		launchpad_input_queue[lp_identifier].emplace(data, data + length);
+	});
+	return static_cast<double>(lp->ID_get());
 }
 
 //midi_ID에 들어온 메시지 입력의 크기를 반환합니다.
@@ -150,14 +144,15 @@ API double midi_output_open(double N)
 	auto N_t = static_cast<size_t>(N);
 	auto list = launchpad::get_available_output_list();
 	if (list.size() <= N_t) return 0; //인덱스 초과
-
 	auto& element = list[N_t];
 	auto [iter, success] = launchpad_list.try_emplace(element.identifier.toStdString(), nullptr);
 	if (success)
 	{
-		iter->second = launchpad::create(ADM, element);
-		launchpad_set(iter->second);
+		iter->second = launchpad::create(ADM);
 	}
+	auto& lp = iter->second;
+	lp->midi_output_set(element);
+	lp->program_mode_set(true); //프로그램 모드로 설정
 	return static_cast<double>(iter->second->ID_get());
 }
 

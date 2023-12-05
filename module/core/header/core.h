@@ -449,8 +449,6 @@ namespace uniq
 	};
 	
 	
-	
-	
 	//콘솔에서 메인 스레드와 독립적으로 메시지 이벤트 처리할 수 있도록 하는 클래스
 	class MainMessageThread : public juce::Thread
 	{

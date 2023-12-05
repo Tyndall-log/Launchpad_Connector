@@ -35,7 +35,7 @@ int test1()
 		return 0;
 	}
 	
-	auto lp = launchpad::create(ADM, list[0]);
+	auto lp = launchpad::create(ADM, list[0], list[0]);
 	lp->program_mode_set(true);
 	lp->input_callback_set([](uint8* data, int size)
 	{

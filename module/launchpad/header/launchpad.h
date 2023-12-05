@@ -19,7 +19,8 @@ namespace uniq
 		static const std::map<std::string, std::tuple<std::string, juce::uint8>> VPID_map;
 		static juce::SpinLock mutex;
 		
-		std::string kind_name;
+		std::string midi_input_kind_name;
+		std::string midi_output_kind_name;
 		std::shared_ptr<juce::AudioDeviceManager> deviceManager;
 		std::unique_ptr<juce::MidiInput> input;
 		std::unique_ptr<juce::MidiOutput> output;
@@ -69,10 +70,13 @@ namespace uniq
 		
 		//launchpad();
 		//launchpad(String kind);
-		launchpad(std::shared_ptr<juce::AudioDeviceManager>, const midi_device_info&);
-		launchpad(std::shared_ptr<juce::AudioDeviceManager>, const midi_device_info&, const midi_device_info&);
+		//launchpad(std::shared_ptr<juce::AudioDeviceManager>, const midi_device_info&);
+		launchpad(std::shared_ptr<juce::AudioDeviceManager>&);
+		launchpad(std::shared_ptr<juce::AudioDeviceManager>&, const midi_device_info&, const midi_device_info&);
 		~launchpad();
 		
+		bool midi_input_set(const midi_device_info&);
+		bool midi_output_set(const midi_device_info&);
 		void message_send_now(juce::MidiMessage&);
 		void hex_send(const juce::String&);
 		void hex_send(const juce::uint8*, std::size_t);

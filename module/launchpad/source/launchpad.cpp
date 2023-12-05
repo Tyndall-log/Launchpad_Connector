@@ -63,24 +63,16 @@ namespace uniq
 		this->kind_name = name.toStdString();
 	}
 	
-	launchpad::launchpad(shared_ptr<AudioDeviceManager> adm, const midi_device_info& mdi)
-	: launchpad(adm, mdi, mdi) {}
-	
-	launchpad::launchpad(shared_ptr<AudioDeviceManager> adm, const midi_device_info& mdi_input, const midi_device_info& mdi_output)
+	launchpad::launchpad(shared_ptr<AudioDeviceManager>& adm)
 	{
 		deviceManager = adm;
 		input_callback = make_unique<midi_callback>();
-		input = MidiInput::openDevice(mdi_input.identifier, input_callback.get());
-		if (input) input->start();
-		else log::println("input is null");
-		output = MidiOutput::openDevice(mdi_output.identifier);
-		kind_name = mdi_input.kind_name;
 		{
 			SpinLock::ScopedLockType lock(mutex);
 			if (launchpad_list.empty())
 			{
 				LED_timer = make_unique<LED_global_timer>();
-				LED_timer->startTimer(10);
+				LED_timer->startTimer(4);
 			}
 			launchpad_list.insert(this);
 			LED_grid_current = vector<vector<VRGB>>(LED_w, vector<VRGB>(LED_h));
@@ -91,6 +83,14 @@ namespace uniq
 			immediate_transmission = false;
 		}
 	}
+	
+	launchpad::launchpad(shared_ptr<AudioDeviceManager>& adm, const midi_device_info& mdi_input, const midi_device_info& mdi_output)
+	: launchpad(adm)
+	{
+		midi_input_set(mdi_input);
+		midi_output_set(mdi_output);
+	}
+	
 	launchpad::~launchpad()
 	{
 		{
@@ -105,6 +105,41 @@ namespace uniq
 		deviceManager.reset();
 	}
 	
+	bool launchpad::midi_input_set(const midi_device_info& mdi_input)
+	{
+		if (input)
+		{
+			input->stop();
+			input.reset();
+		}
+		input = MidiInput::openDevice(mdi_input.identifier, input_callback.get());
+		if (!input)
+		{
+			log::println("input is null");
+			return false;
+		}
+		midi_input_kind_name = mdi_input.kind_name;
+		input->start();
+		return true;
+		
+	}
+	
+	bool launchpad::midi_output_set(const midi_device_info& mdi_output)
+	{
+		if (output)
+		{
+			output.reset();
+		}
+		output = MidiOutput::openDevice(mdi_output.identifier);
+		if (!output)
+		{
+			log::println("output is null");
+			return false;
+		}
+		midi_output_kind_name = mdi_output.kind_name;
+		return true;
+	}
+	
 	void launchpad::message_send_now(juce::MidiMessage& message)
 	{
 		if (!output)
@@ -117,6 +152,7 @@ namespace uniq
 	
 	void launchpad::hex_send(const juce::String& hex)
 	{
+		if (!output) return;
 		auto k = hexStringToBytes(hex);
 		auto m = MidiMessage::createSysExMessage(&k[0], static_cast<int>(k.size()));
 		message_send_now(m);
@@ -124,12 +160,14 @@ namespace uniq
 	
 	void launchpad::hex_send(const juce::uint8* hex, size_t length)
 	{
+		if (!output) return;
 		auto m = MidiMessage::createSysExMessage(hex, static_cast<int>(length));
 		message_send_now(m);
 	}
 	
 	void launchpad::LED_send()
 	{
+		if (!output) return;
 		auto p = LED_raw_data.get() + 6;
 		for (auto x = 0; x < LED_w; x++)
 		{
