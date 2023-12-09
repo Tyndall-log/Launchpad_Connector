@@ -245,7 +245,7 @@ int main()
 ```
 
 이 밖에도 `chain<T>`는 다양한 멤버 함수를 제공합니다.  
-더 복잡한 예시는 `console_test` 폴더 내의 `hierarchy_test.cpp`(임시 `test2.cpp`) 파일을 참고해 주세요.
+더 복잡한 예시는 `console_test` 폴더 내의 ~~`hierarchy_test.cpp`~~(임시 `test2.cpp`) 파일을 참고해 주세요.
 
 ### 메시지 스레드 생성
 

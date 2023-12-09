@@ -50,18 +50,21 @@ Launchpad Connector
 
 ### Windows Console
 
+[**module/launchpad/console_test**](module/launchpad/console_test)를 윈도우 콘솔 용으로 빌드한 테스트입니다.  
+사진을 누르면 유튜브에서 테스트 영상을 보실 수 있습니다.  
+[![Launchpad Connector Test](https://img.youtube.com/vi/1F_2z-fDTU0/0.jpg)](https://www.youtube.com/watch?v=1F_2z-fDTU0)
 
 ### Windows GMS2 DLL
 
 [GameMaker Studio 2](https://www.yoyogames.com/gamemaker) 프로젝트에서 사용하기 위한 예시입니다.  
-[UNIQ_V0.6](https://github.com/Tyndall-log/UNIQ_V0.6)에서 작동 영상과 함께 소스 코드와 빌드 파일을 보실 수 있습니다.  
+[**UNIQ_V0.6**](https://github.com/Tyndall-log/UNIQ_V0.6)에서 **작동 영상**과 함께 소스 코드와 빌드 파일을 보실 수 있습니다.  
 **Launchpad Connector**는 DLL 형태로 빌드되어 사용되었습니다.  
 
 ### Android Flutter SO
 
 [Flutter](https://flutter.dev/) 프로젝트에서 사용하기 위한 예시입니다.  
-[Launchpad_Connector_Example_Android_Flutter](https://github.com/Tyndall-log/Launchpad_Connector_Example_Android_Flutter
-)에서 작동 영상과 함께 소스 코드와 빌드 파일을 보실 수 있습니다.  
+[**Launchpad_Connector_Example_Android_Flutter**](https://github.com/Tyndall-log/Launchpad_Connector_Example_Android_Flutter
+)에서 **작동 영상**과 함께 소스 코드와 빌드 파일을 보실 수 있습니다.  
 **Launchpad Connector**는 SO 형태로 빌드되어 사용되었습니다.
 
 
