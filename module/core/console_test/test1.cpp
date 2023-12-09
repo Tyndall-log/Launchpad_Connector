@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: © 2023 Kim Eun-su <eunsu0402@gmail.com>
 // SPDX-License-Identifier: LGPL-3.0-linking-exception
 
+#include <utility>
+
 #include "main.h"
 
 using namespace std;
@@ -10,12 +12,14 @@ using namespace uniq;
 class A : public ID<A>
 {
 protected:
+	std::string name;
 	A() = default;
+	explicit A(std::string name) : name(std::move(name)) {}
 public:
-	static std::shared_ptr<A> create()
-	{
-		return ID<A>::create();
-	}
+//	static std::shared_ptr<A> create()
+//	{
+//		return ID<A>::create();
+//	}
 	std::string get_name()
 	{
 		return "Class A";
@@ -61,7 +65,7 @@ int test1()
 	auto str = String("Hello juce!");
 	cout << str << "\n";
 	
-	auto a = A::create();
+	auto a = A::create("name");
 	auto b = B::create();
 	auto c = C::create();
 	//c->test();

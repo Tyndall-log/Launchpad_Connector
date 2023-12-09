@@ -18,14 +18,6 @@ static map<string, vector<uint8>> launchpad_input_queue_temp;
 
 
 #ifdef ANDROID
-extern "C" jint JNI_OnLoad(JavaVM* vm, void* reserved)
-{
-	//jassert(true);
-	//jassert(false);
-	//std::runtime_error("JNI_OnLoad");
-	return JNI_OnLoad_test(vm, reserved);
-	//return JNI_VERSION_1_2;
-}
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_rmsl_juce_Java_juceInit(JNIEnv* env, jobject obj)
@@ -115,4 +107,6 @@ Java_com_rmsl_juce_Java_messagesThreadRun()
 		ADM = adm_promise.get_future().get();
 	}
 }
+#else
+#error "이 파일은 안드로이드에서만 사용할 수 있습니다. 문제를 해결하려면 Readme.md에서 '빌드'의 'Android'를 참고하세요."
 #endif

@@ -53,8 +53,7 @@ add_executable(UNIQ_Library_launchpad_test ${CONSOLE_TEST_FILES} ${SOURCE_FILES}
 target_include_directories(UNIQ_Library_launchpad_test PUBLIC header)  #실행 파일에 header 폴더를 포함합니다.
 link_library(UNIQ_Library_launchpad_test)  #라이브러리 링크
 
-file(GLOB API_FILES api/*.cpp) #api 폴더 내의 모든 cpp 파일을 찾습니다.
-add_library(UNIQ_Library_launchpad ${SOURCE_FILES} ${API_FILES})  #라이브러리 생성
+add_library(UNIQ_Library_launchpad ${SOURCE_FILES})  #라이브러리 생성
 target_include_directories(UNIQ_Library_launchpad PUBLIC header)  #라이브러리에 header 폴더를 포함합니다.
 link_library(UNIQ_Library_launchpad)  #라이브러리 링크
 

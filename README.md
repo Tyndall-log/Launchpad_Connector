@@ -7,7 +7,7 @@ Launchpad Connector
 ============
 
 [![UNIQ](https://custom-icon-badges.demolab.com/badge/-UNIQ-FF8F00.svg)](https://fragrant-alarm-7d3.notion.site/UNIQ-fad2be60e85742268cabce1f06184ac1)
-[![JUCE](https://custom-icon-badges.demolab.com/badge/JUCE_v7.0.8-F38D48.svg?logo=JUCE%2032x32)](https://juce.com/)
+[![JUCE](https://custom-icon-badges.demolab.com/badge/JUCE_v7.0.9-F38D48.svg?logo=JUCE%2032x32)](https://juce.com/)
 ![C++](https://img.shields.io/badge/-C++20-F34B7D.svg?logo=c%2B%2B&style=flat)
 [![license](https://custom-icon-badges.demolab.com/badge/license-LGPL--3.0--linking--exception-green.svg?logo=law)](https://spdx.org/licenses/LGPL-3.0-linking-exception.html)
 [![REUSE status](https://api.reuse.software/badge/github.com/Tyndall-log/Launchpad_Connector)](https://api.reuse.software/info/github.com/Tyndall-log/Launchpad_Connector)
@@ -34,9 +34,11 @@ Launchpad Connector
 	- 상하위 객체의 연결 관리 자동화 
 	- 상하위 객체의 상속 여부에 따른 변수 값 자동 동기화
 	- 메시지 스레드 생성
+    - 편리한 log 기능
 - launchpad 모듈
 	- 모든 Novation 런치패드 지원[^각주_런치패드]
 	- 연결된 런치패드 목록(기종 확인)
+    - 다중 런치패드 동시 지원
 	- 런치패드 연결 자동화
 	- 런치패드 입력 감지
 	- 런치패드 버튼(LED) 색 설정 ({고정 빈도, 즉시 전송} 모드 지원)
@@ -44,23 +46,60 @@ Launchpad Connector
 
 [^각주_런치패드]: 2023년 12월 이전에 출시된 모든 런치패드 기종
 
+## 사용 예시
+
+### Windows Console
+
+
+### Windows GMS2 DLL
+
+[GameMaker Studio 2](https://www.yoyogames.com/gamemaker) 프로젝트에서 사용하기 위한 예시입니다.  
+[UNIQ_V0.6](https://github.com/Tyndall-log/UNIQ_V0.6)에서 작동 영상과 함께 소스 코드와 빌드 파일을 보실 수 있습니다.  
+**Launchpad Connector**는 DLL 형태로 빌드되어 사용되었습니다.  
+
+### Android Flutter SO
+
+[Flutter](https://flutter.dev/) 프로젝트에서 사용하기 위한 예시입니다.  
+[Launchpad_Connector_Example_Android_Flutter](https://github.com/Tyndall-log/Launchpad_Connector_Example_Android_Flutter
+)에서 작동 영상과 함께 소스 코드와 빌드 파일을 보실 수 있습니다.  
+**Launchpad Connector**는 SO 형태로 빌드되어 사용되었습니다.
+
 
 ## 프로젝트 구조
-- **LICENSES**  <sub>*라이선스 고지*</sub>
-- **api**  <sub>*예시 api 함수<sub>ㅎ</sub>*</sub>
+
+본 프로젝트는 기본적으로 여러개의 모듈로 구성되어 있습니다.  
+각 모듈은 독립적인 기능을 가지며, 다른 모듈과의 의존성이 최소화되도록 설계되었습니다.  
+따라서 필요에 따라 손 쉽게 모듈을 추가하거나 제거할 수 있습니다.  
+각 모듈은 다음과 같은 폴더 구조를 가집니다.  
+
+- **&lt;module_name&gt;**  <sub>*모듈 이름*</sub>
+	- **header**  <sub>*헤더 폴더*</sub>
+	- **source**  <sub>*소스 폴더*</sub>
+	- **console_test**  <sub>*콘솔 테스트 폴더*</sub>
+	- **README.md**  <sub>*모듈 설명*</sub>
+	- **CMakeLists.txt**  <sub>*Cmake 구성 파일*</sub>
+
+이러한 모듈들을 통합하여 빌드하기 위해, 프로젝트의 최상위 폴더는 다음과 같은 구조를 가집니다.  
+
+- **LICENSES**  <sub>*프로젝트에 사용된 라이선스 폴더*</sub>
+- **example**  <sub>*활용 예시 폴더*</sub>
 - **module**  <sub>*필요 모듈이 있는 폴더*</sub>
-	- **core**  <sub>*핵심 함수*</sub>
-		- **console_test**  <sub>*모듈 테스트 및 활용 예제*</sub>
-		- **header**  <sub>*헤더 폴더*</sub>
-		- **source**  <sub>*소스 폴더*</sub>
+	- **core**  <sub>*핵심 모듈*</sub>
+		- 자세한 내용은 [module/core/README.md](module/core/README.md)를 참고해 주세요.
 	- **juce**  <sub>*JUCE 모듈 <sub>Cmake에 의해 자동 설치</sub>*</sub>
 	- **launchpad**  <sub>*런치패드 모듈*</sub>
-		- [core와 동일 구조]
+		- 자세한 내용은 [module/launchpad/README.md](module/launchpad/README.md)를 참고해 주세요.
+- **CMakeLists.txt**  <sub>*Cmake 구성 파일*</sub>
+- **README.md**  <sub>*프로젝트 설명*</sub>
+
+모듈 폴더 내에는 해당 모듈의 기능을 테스트하기 위한 콘솔 프로그램이 포함되어 있습니다.  
+이를 통해 각 모듈의 기능을 쉽게 확인할 수 있습니다.  
+**UNIQ_Library_&lt;module_name&gt;_test** 구성을 통해 해당 모듈의 콘솔 프로그램을 빌드하여 실행할 수 있습니다.  
 
 ## 문서
 
+각 모듈에 대한 사용 예제는 해당 폴더 내 README.md 파일을 참고해 주세요.
 내부 함수에 대한 자세한 정보는 소스 파일 내 주석(한국어)을 참고해 주세요.  
-각 모듈에 대한 사용 예제는 해당 폴더 내 console_test 폴더를 참고해 주세요.
 
 ## Q&A
 
@@ -90,11 +129,11 @@ Windows, Android, MacOS, iOS, Linux
 c++20을 지원하는 컴파일러[^각주_컴파일러]  
 Cmake 3.26 이상
 
-[^각주_JUCE]: JUCE v7.0.8 release [github](https://github.com/juce-framework/JUCE/releases/tag/7.0.8)
+[^각주_JUCE]: JUCE v7.0.9 release [github](https://github.com/juce-framework/JUCE/releases/tag/7.0.9)
 [^각주_컴파일러]: MSVC v143(Visual Studio 2022) 및 x64-Clang(v16.0.5)에서 테스트 되었으며, 다른 컴파일러는 추가적인 설정과 인클루드가 필요할 수 있습니다.
 
 ### Windows
-Windows 환경에서 cmake를 구성해야 합니다.
+Windows 환경에서 cmake를 구성해야 합니다.  
 추가적인 설정이 없습니다.
 
 ### Android
@@ -122,3 +161,7 @@ Linux 환경에서 cmake를 구성해야 합니다.
 본 라이브러리는 CMake 구성을 통해 JUCE 라이브러리의 소스 코드를 자동으로 설치합니다. 이 과정에서 ISC 라이선스[^각주_JUCE_ISC]를 따르지 않는 다른 JUCE 모듈들도 함께 설치됩니다. 사용자가 이러한 다른 모듈들을 추가적으로 사용하기로 결정할 경우, 해당 모듈들은 JUCE의 다른 라이선스 조건(예: GPL)을 따라야 합니다.
 
 [^각주_JUCE_ISC]: JUCE 7 End User License Agreement, 조항 12.8, JUCE의 ISC 라이선스에 대한 정보는 [여기에서 확인](https://juce.com/juce-7-license/#:~:text=the%20Revenue%20Limit.-,12.8.%C2%A0ISC%20License%3A,-the%20permissive%20ISC)할 수 있습니다.
+
+---
+
+본 프로젝트는 [SPDX](https://spdx.org/licenses/) 라이선스 규격 및 [REUSE](https://reuse.software/) 프로젝트를 준수합니다.
