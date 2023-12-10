@@ -10,7 +10,7 @@ SPDX-License-Identifier: LGPL-3.0-linking-exception
 **Launchpad Module**은 **UNIQ_Library**(Launchpad Connector)의 런치패드 모듈입니다.  
 
 **Launchpad Module**은 모든 Novation 런치패드[^각주_런치패드]를 쉽고 편하게 지원하기 위한 고수준 함수를 제공합니다.  
-특히 다중 런치패드를 지원하며, 크로스 플렛폼을 지원하도록 개발되었습니다.
+특히 다중 런치패드를 지원하며, 크로스 플랫폼을 지원하도록 개발되었습니다.
 
 > **Launchpad Module**은 **Core Module**을 필요로 합니다.
 

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: © 2023 Kim Eun-su <eunsu0402@gmail.com>
 // SPDX-License-Identifier: LGPL-3.0-linking-exception
 
-// 이 파일은 외부 어플리케이션에서 "Launchpad Connector"를 사용하기 위한 동적 라이브러리의 예제를 보여줍니다.
+// 이 파일은 외부 애플리케이션에서 "Launchpad Connector"를 사용하기 위한 동적 라이브러리의 예제를 보여줍니다.
 // 본 라이브러리를 외부 프로그램인 GMS2(Gamemaker Studio 2)에서 사용하기 위해 windows용 DLL빌드합니다.
 // 특히, GMS2에서는 DLL과 오로지 char*, double만 주고 받을 수 있는 제약사항이 있습니다.
 // 이 예제 목표는 이런 제약사항에서도 효과적이고 잘 동작하는 방법을 보여주는 것입니다.

@@ -12,9 +12,16 @@ Launchpad Connector
 [![license](https://custom-icon-badges.demolab.com/badge/license-LGPL--3.0--linking--exception-green.svg?logo=law)](https://spdx.org/licenses/LGPL-3.0-linking-exception.html)
 [![REUSE status](https://api.reuse.software/badge/github.com/Tyndall-log/Launchpad_Connector)](https://api.reuse.software/info/github.com/Tyndall-log/Launchpad_Connector)
 
-**Launchpad Connector**는 [UNIQ_Library](https://github.com/Tyndall-log/UNIQ_Library)를 위해 개발된 런치패드 연결용 핵심 라이브러리입니다.  
-크로스 플렛폼을 지원하도록 개발되었습니다.  
+**Launchpad Connector**는 [UNIQ_Library](https://github.com/Tyndall-log/UNIQ_Library)를 위해 **크로스 플랫폼**으로 개발된 런치패드 연결용 핵심 라이브러리입니다.  
 누구나 사용할 수 있도록 라이브러리 형태로 공개합니다.  
+
+## 왜 Launchpad Connector를 사용해야 할까요?
+
+**Launchpad Connector**는 단순히 런치패드 연결을 위한 핵심 기능을 제공할 뿐만 아니라,
+최신 `c++20` 표준을 적극 활용하여 높은 안정성과 편리한 사용성을 제공합니다.  
+특히, 독창적인 `객체 ID 관리 시스템`과 `상하위 객체의 연결 관리 시스템`으로 편리하고 안정적인 객체 관리를 제공합니다.  
+무엇보다 이 모든 기능을 **크로스 플랫폼**으로 제공한다는 것이 **Launchpad Connector**의 가장 멋진 점입니다.  
+어서 나만의 런치패드 애플리케이션을 만들어 언제 어디서든 즐겨보세요!  
 
 ## 주요 기능
 
@@ -126,7 +133,7 @@ c++ 컴파일러와 [JUCE](https://www.juce.com/) 프레임워크가 필요합�
 
 Windows, Android, MacOS, iOS, Linux
 
-### 플렛폼 공통 최소 빌드 시스템
+### 플랫폼 공통 최소 빌드 시스템
 
 [JUCE 7](https://juce.com/juce-7-license/)[^각주_JUCE] <sub>Cmake에 의해 자동 설치</sub>  
 c++20을 지원하는 컴파일러[^각주_컴파일러]  
